@@ -1,0 +1,36 @@
+#!/bin/bash
+
+if [ $# -ne 2 ]; then
+	#echo "Usage: \n sim_sv {Cfile.cpp} {top_module.sv}"
+
+	printf "Usage:\nsim_sv {Cfile.cpp} {top_module.sv}"
+	exit 0
+fi
+arg1=$1
+arg2=$2
+if test ! -f "$1"; then
+	echo "$1 cpp file does not exist"
+	exit 1
+elif test ! -f "$2"; then
+	echo "$2 sv file does not exist"
+	exit 1
+elif [[ $arg1 != *.cpp ]]; then
+	echo "$1 not a cpp file"
+	exit 1
+elif [[ $arg2 != *.sv ]]; then
+	echo "$2 is not a sv file"
+	exit 1
+fi
+
+	
+len=${#arg2}
+#printf "$len\n"
+index=`expr index "arg2" "."`
+#printf "$index\n"
+arg2=${arg2:0:len-3}
+#printf "$arg2\
+
+verilator -Wall -cc --exe --build ${1} ${2}
+
+obj_dir/V$arg2
+exit 0

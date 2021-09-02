@@ -6,7 +6,6 @@ module counter_top(
 	output byte count
 );
 	counter counter_inst(clk, count);
-
 	always@(posedge clk) begin
 		$display(count);
 	end
