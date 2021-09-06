@@ -1,40 +1,51 @@
 `timescale 1ns/1ps
 
-module async_fifo(
-	input w_clk,
-	input r_clk,
-	input re,
-	input we,
-	input rst,
-	input din,
-	output dout,
-	output full,
-	output empty
+module async_fifo
+	#(parameter PNTR_WIDTH = 8,
+		parameter DATA_WIDTH = 8,
+		parameter FIFO_DEPTH = 8) 
+		
+	(
+	w_clk,
+	r_clk,
+	re,
+	we,
+	rst,
+	din,
+	dout,
+	full,
+	empty
 );
 
-parameter PNTR_WIDTH = 8;
-parameter FIFO_DEPTH = 8;
-parameter DATA_WIDTH = 8;
+//parameter PNTR_WIDTH = 8;
+//parameter FIFO_DEPTH = 8;
+//parameter DATA_WIDTH = 8;
 
-logic [0:DATA_WIDTH-1] din, dout; //Data in Data out declarations based on params
+input logic w_clk, r_clk, we, re, rst;
+input logic [DATA_WIDTH-1:0] din;
+output logic [DATA_WIDTH - 1:0] dout; //Data in Data out declarations based on params
+output logic full, empty;
 
-logic [0:FIFO_DEPTH - 1] w_ptr, r_ptr; //Internal pointers
+logic [PNTR_WIDTH - 1:0] w_ptr, r_ptr; //Internal pointers
 
-logic [0:DATA_WIDTH - 1] mem [FIFO_DEPTH - 1:0]; //2D memory array
+logic [DATA_WIDTH - 1:0] mem [FIFO_DEPTH - 1:0]; //2D memory array
 
-logic [0:FIFO_DEPTH - 1] rw_diff; //interal staus indicator for verif
+//logic [PNTR_WIDTH- 1:0] rw_diff; //interal staus indicator for verif
 
 assign full = w_ptr == FIFO_DEPTH - 1; //Full when w_ptr = max fifo size
 
 assign empty = w_ptr == 0; //Empty when w_pntr at bottom of array
 
-always_ff@(negedge rst) begin
-	w_ptr <= 0;
-	r_ptr <= 0;
-	end
+//always_ff@(negedge rst) begin
+//	if(~rst) begin
+//		w_ptr <= 0;
+//		r_ptr <= 0;
+//		end
+//	end
 //Write block
-always_ff@(posedge w_clk) begin
+always_ff@(posedge w_clk or negedge rst) begin
 	if(~rst) begin
+		w_ptr <= 0;
 	end
 	else if(we && !full) begin
 		mem[w_ptr] <= din; //Blocking to make sure ptr does not decrement
@@ -42,8 +53,9 @@ always_ff@(posedge w_clk) begin
 		end
 	end
 //Read block
-always_ff@(posedge r_clk) begin
+always_ff@(posedge r_clk or negedge rst) begin
 	if(~rst) begin
+		r_ptr <= 0;
 	end
 	else if(re && !empty) begin
 		dout <= mem[r_ptr];
@@ -51,9 +63,9 @@ always_ff@(posedge r_clk) begin
 		end
 	end
 
-always_comb
-	rw_status = w_ptr - r_ptr;
-	end
+//always_comb begin
+//	rw_diff = w_ptr - r_ptr;
+//	end
 
 endmodule
 

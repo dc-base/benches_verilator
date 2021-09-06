@@ -1,18 +1,11 @@
-#!/bin/bash
-
-if [ $# -ne 2 ]; then
-	printf "Usage:\nmk_verilator_bench {top_module_name} {destination_name}\n"
-	exit 0
-fi
-cat >> $2.cpp <<EOL
-#include "V$1.h"
+#include "Vtop.h"
 #include "verilated.h"
 
 #define MAX_CLOCKS 50
 int main(int argc, char** argv, char** env){
 	VerilatedContext* contextp = new VerilatedContext;
 	contextp->commandArgs(argc, argv);
-	V$1* top = new V$1{contextp};
+	Vtop* top = new Vtop{contextp};
 	//Add some sort of clock limit so we do not get stuck infinite
 	int clk_cnt = 0;
 	while (!contextp->gotFinish() && clk_cnt < MAX_CLOCKS) {
@@ -24,7 +17,3 @@ int main(int argc, char** argv, char** env){
 	delete contextp;
 	return 0;
 }
-EOL
-
-printf "Using $1 top module, new skeleton verilator bench is in $2.cpp\n"
-exit 0
