@@ -11,6 +11,22 @@ VL_INLINE_OPT void Vtop___024root___sequent__TOP__2(Vtop___024root* vlSelf) {
     Vtop__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vtop___024root___sequent__TOP__2\n"); );
     // Body
+    if (VL_UNLIKELY((1U & (~ (IData)(vlSelf->rst))))) {
+        VL_WRITEF("VC: Resetting\n");
+    }
+    if (VL_UNLIKELY(vlSelf->w_clk)) {
+        VL_WRITEF("VC: Write clocking\n");
+    }
+    if (VL_UNLIKELY(vlSelf->r_clk)) {
+        VL_WRITEF("VC: Read clocking\n");
+    }
+}
+
+VL_INLINE_OPT void Vtop___024root___sequent__TOP__3(Vtop___024root* vlSelf) {
+    if (false && vlSelf) {}  // Prevent unused
+    Vtop__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
+    VL_DEBUG_IF(VL_DBG_MSGF("+    Vtop___024root___sequent__TOP__3\n"); );
+    // Body
     if (vlSelf->rst) {
         if (((IData)(vlSelf->re) & (~ (IData)(vlSelf->empty)))) {
             vlSelf->dout = ((4U >= (IData)(vlSelf->top__DOT__fifo__DOT__r_ptr))
@@ -24,10 +40,10 @@ VL_INLINE_OPT void Vtop___024root___sequent__TOP__2(Vtop___024root* vlSelf) {
     }
 }
 
-VL_INLINE_OPT void Vtop___024root___sequent__TOP__3(Vtop___024root* vlSelf) {
+VL_INLINE_OPT void Vtop___024root___sequent__TOP__4(Vtop___024root* vlSelf) {
     if (false && vlSelf) {}  // Prevent unused
     Vtop__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
-    VL_DEBUG_IF(VL_DBG_MSGF("+    Vtop___024root___sequent__TOP__3\n"); );
+    VL_DEBUG_IF(VL_DBG_MSGF("+    Vtop___024root___sequent__TOP__4\n"); );
     // Init
     CData/*2:0*/ __Vdlyvdim0__top__DOT__fifo__DOT__mem__v0;
     CData/*7:0*/ __Vdlyvval__top__DOT__fifo__DOT__mem__v0;
@@ -65,13 +81,18 @@ void Vtop___024root___eval(Vtop___024root* vlSelf) {
     Vtop__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vtop___024root___eval\n"); );
     // Body
+    if (((((IData)(vlSelf->r_clk) & (~ (IData)(vlSelf->__Vclklast__TOP__r_clk))) 
+          | ((~ (IData)(vlSelf->rst)) & (IData)(vlSelf->__Vclklast__TOP__rst))) 
+         | ((IData)(vlSelf->w_clk) & (~ (IData)(vlSelf->__Vclklast__TOP__w_clk))))) {
+        Vtop___024root___sequent__TOP__2(vlSelf);
+    }
     if ((((IData)(vlSelf->r_clk) & (~ (IData)(vlSelf->__Vclklast__TOP__r_clk))) 
          | ((~ (IData)(vlSelf->rst)) & (IData)(vlSelf->__Vclklast__TOP__rst)))) {
-        Vtop___024root___sequent__TOP__2(vlSelf);
+        Vtop___024root___sequent__TOP__3(vlSelf);
     }
     if ((((~ (IData)(vlSelf->rst)) & (IData)(vlSelf->__Vclklast__TOP__rst)) 
          | ((IData)(vlSelf->w_clk) & (~ (IData)(vlSelf->__Vclklast__TOP__w_clk))))) {
-        Vtop___024root___sequent__TOP__3(vlSelf);
+        Vtop___024root___sequent__TOP__4(vlSelf);
     }
     // Final
     vlSelf->__Vclklast__TOP__r_clk = vlSelf->r_clk;

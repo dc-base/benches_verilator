@@ -14,10 +14,10 @@ VL_ATTR_COLD void Vtop___024root___initial__TOP__1(Vtop___024root* vlSelf) {
     VL_WRITEF("Compiled Correctly\n");
 }
 
-VL_ATTR_COLD void Vtop___024root___settle__TOP__4(Vtop___024root* vlSelf) {
+VL_ATTR_COLD void Vtop___024root___settle__TOP__5(Vtop___024root* vlSelf) {
     if (false && vlSelf) {}  // Prevent unused
     Vtop__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
-    VL_DEBUG_IF(VL_DBG_MSGF("+    Vtop___024root___settle__TOP__4\n"); );
+    VL_DEBUG_IF(VL_DBG_MSGF("+    Vtop___024root___settle__TOP__5\n"); );
     // Body
     vlSelf->full = (4U == (IData)(vlSelf->top__DOT__fifo__DOT__w_ptr));
     vlSelf->empty = (0U == (IData)(vlSelf->top__DOT__fifo__DOT__w_ptr));
@@ -39,7 +39,7 @@ VL_ATTR_COLD void Vtop___024root___eval_settle(Vtop___024root* vlSelf) {
     Vtop__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vtop___024root___eval_settle\n"); );
     // Body
-    Vtop___024root___settle__TOP__4(vlSelf);
+    Vtop___024root___settle__TOP__5(vlSelf);
 }
 
 VL_ATTR_COLD void Vtop___024root___final(Vtop___024root* vlSelf) {
