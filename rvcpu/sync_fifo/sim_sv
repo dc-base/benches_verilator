@@ -30,7 +30,7 @@ index=`expr index "arg2" "."`
 arg2=${arg2:0:len-3}
 #printf "$arg2\
 
-verilator -Wall -cc --exe --build ${1} ${2}
+verilator -Wall -cc --assert --exe --build ${1} ${2}
 
 obj_dir/V$arg2
 exit 0
