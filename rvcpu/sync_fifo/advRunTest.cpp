@@ -1,7 +1,8 @@
 #include "Vsync_fifo.h"
 #include "verilated.h"
-//Borrowed templated from zipcpu, custom modified.
-//templace operations on generic types (takes a class type)
+//Borrowed template from zipcpu, custom modified.
+//template operations on generic types (takes a class type)
+//sync_fifo(clk, rst, write,  read, wData, rdData, empty, full
 template<class MODULE> class TESTBENCH {
 	int clocks;
 	MODULE *top;
@@ -35,6 +36,52 @@ template<class MODULE> class TESTBENCH {
 	public: virtual bool done(void){
 		return Verilated::gotFinish();
 	}
+	public: virtual void writeData(int data){
+		printf("writing %d\n", data);
+		top->clk = 0;
+		top->wData = data;
+		top->write = 1;
+		top->eval();
+		top->clk = 1;
+		top->eval();
+		top->wData = 0;
+		top->write = 0;
+		top->clk = 0;
+		top->eval();
+		clocks++;
+	}
+	public: virtual unsigned int readData() {
+		int dataRet;
+		top->clk = 0;
+		top->eval();
+		top->read = 1;
+		top->clk = 1;
+		dataRet = top->rdData;
+		top->eval();
+		top->clk = 0;
+		top->eval();
+		clocks++;
+		return dataRet;
+	}
+	
+	public: virtual unsigned int rwData(int data) {
+		int dataRet;
+		top->clk = 0;
+		top->eval();
+		top->write = 1;
+		top->read = 1;
+		top->wData = data;
+		top->clk = 1;
+		dataRet = top->rdData;
+		top->eval();
+		top->clk = 0;
+		top->wData = 0;
+		top->write = 0;
+		top->read = 0;
+		top->eval();
+		clocks++;
+		return dataRet;
+	}
 
 };
 #define MAX_CLOCKS 50
@@ -43,10 +90,13 @@ int main(int argc, char** argv){
 	TESTBENCH<Vsync_fifo> *bench = new TESTBENCH<Vsync_fifo>();
  	
 	bench->reset();	
-	while (!bench->done() && bench->getClocks() <= MAX_CLOCKS) {
-		bench->tick();
-		printf("[CLOCK] : %d", bench->getClocks());
-	} 
+	bench->writeData(5);
+	printf("Read: %d\n", bench->readData());
+	
+	//while (!bench->done() && bench->getClocks() <= MAX_CLOCKS) {
+	//	bench->tick();
+	//	printf("[CLOCK] : %d", bench->getClocks());
+	//} 
 	printf("\n");
 	exit(EXIT_SUCCESS);
 	return 0;

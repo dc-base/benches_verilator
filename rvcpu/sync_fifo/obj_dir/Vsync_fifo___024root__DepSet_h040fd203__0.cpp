@@ -20,5 +20,5 @@ VL_INLINE_OPT void Vsync_fifo___024root___sequent__TOP__2(Vsync_fifo___024root* 
             }
         }
     }
-    VL_WRITEF("%3#\n",8,vlSelf->sync_fifo__DOT__count);
+    VL_WRITEF("COUNT: %4d\n",8,vlSelf->sync_fifo__DOT__count);
 }
