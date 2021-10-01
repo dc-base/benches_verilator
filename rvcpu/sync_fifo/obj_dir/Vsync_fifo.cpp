@@ -3,6 +3,7 @@
 
 #include "Vsync_fifo.h"
 #include "Vsync_fifo__Syms.h"
+#include "verilated_vcd_c.h"
 
 //============================================================
 // Constructors
@@ -48,6 +49,7 @@ static void _eval_initial_loop(Vsync_fifo__Syms* __restrict vlSymsp) {
     vlSymsp->__Vm_didInit = true;
     Vsync_fifo___024root___eval_initial(&(vlSymsp->TOP));
     // Evaluate till stable
+    vlSymsp->__Vm_activity = true;
     do {
         VL_DEBUG_IF(VL_DBG_MSGF("+ Initial loop\n"););
         Vsync_fifo___024root___eval_settle(&(vlSymsp->TOP));
@@ -64,6 +66,7 @@ void Vsync_fifo::eval_step() {
     // Initialize
     if (VL_UNLIKELY(!vlSymsp->__Vm_didInit)) _eval_initial_loop(vlSymsp);
     // Evaluate till stable
+    vlSymsp->__Vm_activity = true;
     do {
         VL_DEBUG_IF(VL_DBG_MSGF("+ Clock loop\n"););
         Vsync_fifo___024root___eval(&(vlSymsp->TOP));
@@ -86,4 +89,31 @@ VerilatedContext* Vsync_fifo::contextp() const {
 
 const char* Vsync_fifo::name() const {
     return vlSymsp->name();
+}
+
+//============================================================
+// Trace configuration
+
+void Vsync_fifo___024root__trace_init_top(Vsync_fifo___024root* vlSelf, VerilatedVcd* tracep);
+
+static void trace_init(void* voidSelf, VerilatedVcd* tracep, uint32_t code) {
+    // Callback from tracep->open()
+    Vsync_fifo___024root* const __restrict vlSelf VL_ATTR_UNUSED = static_cast<Vsync_fifo___024root*>(voidSelf);
+    Vsync_fifo__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
+    if (!vlSymsp->_vm_contextp__->calcUnusedSigs()) {
+        VL_FATAL_MT(__FILE__, __LINE__, __FILE__,
+            "Turning on wave traces requires Verilated::traceEverOn(true) call before time 0.");
+    }
+    vlSymsp->__Vm_baseCode = code;
+    tracep->module(vlSymsp->name());
+    tracep->scopeEscape(' ');
+    Vsync_fifo___024root__trace_init_top(vlSelf, tracep);
+    tracep->scopeEscape('.');
+}
+
+void Vsync_fifo___024root__trace_register(Vsync_fifo___024root* vlSelf, VerilatedVcd* tracep);
+
+void Vsync_fifo::trace(VerilatedVcdC* tfp, int, int) {
+    tfp->spTrace()->addInitCb(&trace_init, &(vlSymsp->TOP));
+    Vsync_fifo___024root__trace_register(&(vlSymsp->TOP), tfp->spTrace());
 }

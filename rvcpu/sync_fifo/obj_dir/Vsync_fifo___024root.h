@@ -26,6 +26,7 @@ VL_MODULE(Vsync_fifo___024root) {
     VL_IN(wData,31,0);
     VL_OUT(rdData,31,0);
     VlUnpacked<IData/*31:0*/, 8> sync_fifo__DOT__mem;
+    VlUnpacked<CData/*0:0*/, 2> __Vm_traceActivity;
 
     // INTERNAL VARIABLES
     Vsync_fifo__Syms* vlSymsp;  // Symbol table

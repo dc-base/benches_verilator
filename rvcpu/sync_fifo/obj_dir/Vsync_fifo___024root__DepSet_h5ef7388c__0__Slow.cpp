@@ -66,4 +66,7 @@ VL_ATTR_COLD void Vsync_fifo___024root___ctor_var_reset(Vsync_fifo___024root* vl
     vlSelf->sync_fifo__DOT__w_ptr = VL_RAND_RESET_I(3);
     vlSelf->sync_fifo__DOT__r_ptr = VL_RAND_RESET_I(3);
     vlSelf->sync_fifo__DOT__count = 0;
+    for (int __Vi0=0; __Vi0<2; ++__Vi0) {
+        vlSelf->__Vm_traceActivity[__Vi0] = VL_RAND_RESET_I(1);
+    }
 }

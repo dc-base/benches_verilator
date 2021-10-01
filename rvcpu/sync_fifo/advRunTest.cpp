@@ -1,19 +1,37 @@
 #include "Vsync_fifo.h"
 #include "verilated.h"
+#include <verilated_vcd_c.h>
 //Borrowed template from zipcpu, custom modified.
 //template operations on generic types (takes a class type)
 //sync_fifo(clk, rst, write,  read, wData, rdData, empty, full
 template<class MODULE> class TESTBENCH {
 	int clocks;
+	
+	VerilatedVcdC *trace;
+	
 	MODULE *top;
-
+	
 	public: TESTBENCH(void) {
 		top = new MODULE;
+		Verilated::traceEverOn(true);
 		clocks = 0;
 	}
 	public: virtual ~TESTBENCH(void){
 		delete top;
 		top = NULL;
+	}
+	public: void openTrace(const char *vcdName){
+		if(!trace){
+			trace = new VerilatedVcdC;
+			top->trace(trace, 99);
+			trace->open(vcdName);
+		}
+	}
+	public: void closeTrace(void){
+		if(trace) {
+			trace->close();
+			trace = NULL;
+		}
 	}
 	public: virtual void reset(void){
 		printf("[RESET]\n"); 
@@ -22,13 +40,20 @@ template<class MODULE> class TESTBENCH {
 		top->rst = 1;
 	}
 	public: virtual void tick(void){
+		clocks++;
 		top->clk = 0;
 		top->eval();
+		if(trace) trace->dump(10*clocks-2);
 		top->clk = 1;
 		top->eval();
+		if(trace) trace->dump(10*clocks);
 		top->clk = 0;
 		top->eval();
-		clocks++;
+		if(trace){
+			trace->dump(10*clocks+5);
+			trace->flush();
+		}
+		//clocks++;
 	}
 	public: virtual int getClocks(){
 		return clocks;
@@ -38,17 +63,11 @@ template<class MODULE> class TESTBENCH {
 	}
 	public: virtual void writeData(int data){
 		printf("writing %d\n", data);
-		top->clk = 0;
 		top->wData = data;
 		top->write = 1;
-		top->eval();
-		top->clk = 1;
-		top->eval();
 		top->wData = 0;
 		top->write = 0;
-		top->clk = 0;
-		top->eval();
-		clocks++;
+		tick();
 	}
 	public: virtual unsigned int readData() {
 		int dataRet;
@@ -88,7 +107,7 @@ template<class MODULE> class TESTBENCH {
 int main(int argc, char** argv){
 	Verilated::commandArgs(argc, argv);
 	TESTBENCH<Vsync_fifo> *bench = new TESTBENCH<Vsync_fifo>();
- 	
+ 	bench->openTrace("Dump.vcd");	
 	bench->reset();	
 	bench->writeData(5);
 	printf("Read: %d\n", bench->readData());
@@ -96,7 +115,8 @@ int main(int argc, char** argv){
 	//while (!bench->done() && bench->getClocks() <= MAX_CLOCKS) {
 	//	bench->tick();
 	//	printf("[CLOCK] : %d", bench->getClocks());
-	//} 
+	//}
+	bench->closeTrace(); 
 	printf("\n");
 	exit(EXIT_SUCCESS);
 	return 0;

@@ -74,6 +74,7 @@ void Vsync_fifo___024root___eval(Vsync_fifo___024root* vlSelf) {
     if ((((IData)(vlSelf->clk) & (~ (IData)(vlSelf->__Vclklast__TOP__clk))) 
          | ((~ (IData)(vlSelf->rst)) & (IData)(vlSelf->__Vclklast__TOP__rst)))) {
         Vsync_fifo___024root___sequent__TOP__3(vlSelf);
+        vlSelf->__Vm_traceActivity[1U] = 1U;
     }
     // Final
     vlSelf->__Vclklast__TOP__clk = vlSelf->clk;
