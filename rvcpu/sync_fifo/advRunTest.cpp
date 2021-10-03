@@ -1,6 +1,10 @@
 #include "Vsync_fifo.h"
 #include "verilated.h"
 #include <verilated_vcd_c.h>
+#include <limits.h>
+#include <queue>
+#include <time.h>
+#include <stdlib.h>
 //Borrowed template from zipcpu, custom modified.
 //template operations on generic types (takes a class type)
 //sync_fifo(clk, rst, write,  read, wData, rdData, empty, full
@@ -11,6 +15,7 @@ template<class MODULE> class TESTBENCH {
 	
 	MODULE *top;
 	
+	queue<int> checker;
 	public: TESTBENCH(void) {
 		top = new MODULE;
 		Verilated::traceEverOn(true);
@@ -65,53 +70,62 @@ template<class MODULE> class TESTBENCH {
 		printf("writing %d\n", data);
 		top->wData = data;
 		top->write = 1;
-		top->wData = 0;
-		top->write = 0;
+		//top->wData = 0x11111111;
+		top->wData = data;
 		tick();
+		top->write = 0;
+		checker.push(data);
 	}
-	public: virtual unsigned int readData() {
-		int dataRet;
-		top->clk = 0;
-		top->eval();
+	public: virtual void readData() {
 		top->read = 1;
-		top->clk = 1;
-		dataRet = top->rdData;
-		top->eval();
-		top->clk = 0;
-		top->eval();
-		clocks++;
-		return dataRet;
+		tick();
+		int dataRead = top->rdData;	
+		printf("Read: %d\n", dataRead);
+		top->read = 0;
+		if(dataRead != checker.pop()) {
+			printf("[ERROR] read data does not match internal FIFO");
+		}
 	}
 	
-	public: virtual unsigned int rwData(int data) {
-		int dataRet;
-		top->clk = 0;
-		top->eval();
-		top->write = 1;
+	public: virtual void rwData(int data) {
 		top->read = 1;
+		top->write = 1;
 		top->wData = data;
-		top->clk = 1;
-		dataRet = top->rdData;
-		top->eval();
-		top->clk = 0;
-		top->wData = 0;
-		top->write = 0;
+		tick();
+		int dataRead = top->rdData;
+		printf("Write: %d, Read: %d", data, dataRead);
 		top->read = 0;
-		top->eval();
-		clocks++;
-		return dataRet;
+		checker.push(data);
+		if(dataRead != checker.pop()) {
+			printf("[ERROR] read data does not match internal FIFO");
+		}
 	}
 
 };
 #define MAX_CLOCKS 50
+#define RAND_SIZE 3
 int main(int argc, char** argv){
 	Verilated::commandArgs(argc, argv);
 	TESTBENCH<Vsync_fifo> *bench = new TESTBENCH<Vsync_fifo>();
  	bench->openTrace("Dump.vcd");	
-	bench->reset();	
-	bench->writeData(5);
-	printf("Read: %d\n", bench->readData());
-	
+	srand (time(NULL)); //init seed
+	int num = rand() % 2;
+	bench->reset();
+	while(bench->getClocks() < MAX_CLOCKS) {	
+		switch(num){
+			case:0 : bench->writeData(rand() % INT_MAX);
+				break;
+			case:1 : bench->readData();
+				break;
+			case:2 bench->rwData(rand() % INT_MAX);
+				break;
+		}
+	}
+
+	//bench->writeData(INT_MAX);
+	//bench->writeData(INT_MIN);
+	//bench->readData();
+	//bench->readData();	
 	//while (!bench->done() && bench->getClocks() <= MAX_CLOCKS) {
 	//	bench->tick();
 	//	printf("[CLOCK] : %d", bench->getClocks());

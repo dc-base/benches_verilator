@@ -1,7 +1,18 @@
+if(@ARGV != 1){
+	print "Usage perl create_bench.pl [top_module_name]\n";
+}
+
+$top = @ARGV[0];
+$top =~ s/[.].*//;
+
+print $top;
+
+open(TM, ">advRunTest.cpp") or die "unable to open advRunTest.cpp";
+$writeOut = <<"EOF";
 
 
 
-#include "Vhi.h"
+#include "V$top.h"
 #include "verilated.h"
 #include <verilated_vcd_c.h>
 #include <limits.h>
@@ -38,7 +49,7 @@ template<class MODULE> class TESTBENCH {
 		}
 	}
 	public: virtual void reset(void){
-		printf("[RESET]\n"); 
+		printf("[RESET]\\n"); 
 		top->rst = 0;
 		this->tick();
 		top->rst = 1;
@@ -69,7 +80,7 @@ template<class MODULE> class TESTBENCH {
 #define MAX_CLOCKS 50
 int main(int argc, char** argv){
 	Verilated::commandArgs(argc, argv);
-	TESTBENCH<Vsync_fifo> *bench = new TESTBENCH<Vsync_fifo>();
+	TESTBENCH<V$top> *bench = new TESTBENCH<Vsync_fifo>();
  	bench->openTrace("dump.vcd");	
 	bench->reset();	
 	
@@ -80,7 +91,11 @@ int main(int argc, char** argv){
 	//	printf("[CLOCK] : %d", bench->getClocks());
 	//}
 	bench->closeTrace(); 
-	printf("\n");
+	printf("\\n");
 	exit(EXIT_SUCCESS);
 	return 0;
 }
+EOF
+
+print TM $writeOut;
+exit 0

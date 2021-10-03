@@ -25,7 +25,7 @@ module asserts_sync_fifo(
 	//	//$error("[SVA] full and empty fail"); //error will abort sim
 	//	$display("[SVA] full and empty fail, Full: %b Empty: %b", full, empty);
 	//end
-	propEmptyFullFlags: assert property (@(posedge clk) (empty && full)) else begin
+	propEmptyFullFlags: assert property (@(posedge clk) ~(empty && full)) else begin
 		//$error("[SVA] full and empty fail"); //error will abort sim
 		$display("[SVA] full and empty fail, Full: %b Empty: %b", full, empty);
 	end
