@@ -5,7 +5,7 @@ if(@ARGV != 1){
 $top = @ARGV[0];
 $top =~ s/[.].*//;
 
-print $top;
+print "$top\n";
 
 open(TM, ">advRunTest.cpp") or die "unable to open advRunTest.cpp";
 $writeOut = <<"EOF";
