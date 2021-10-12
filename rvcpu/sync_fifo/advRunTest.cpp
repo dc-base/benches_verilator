@@ -30,7 +30,7 @@ template<class MODULE> class TESTBENCH {
 			trace = new VerilatedVcdC;
 			top->trace(trace, 99);
 			trace->open(vcdName);
-		}
+		};
 	}
 	public: void closeTrace(void){
 		if(trace) {
@@ -82,8 +82,9 @@ template<class MODULE> class TESTBENCH {
 		int dataRead = top->rdData;	
 		printf("Read: %d\n", dataRead);
 		top->read = 0;
-		if(dataRead != checker.pop()) {
+		if(dataRead != checker.front()) {
 			printf("[ERROR] read data does not match internal FIFO");
+			checker.pop();
 		}
 	}
 	
@@ -96,8 +97,9 @@ template<class MODULE> class TESTBENCH {
 		printf("Write: %d, Read: %d", data, dataRead);
 		top->read = 0;
 		checker.push(data);
-		if(dataRead != checker.pop()) {
+		if(dataRead != checker.front()) {
 			printf("[ERROR] read data does not match internal FIFO");
+			checker.pop();
 		}
 	}
 
@@ -113,15 +115,14 @@ int main(int argc, char** argv){
 	bench->reset();
 	while(bench->getClocks() < MAX_CLOCKS) {	
 		switch(num){
-			case:0 : bench->writeData(rand() % INT_MAX);
+			case 0: bench->writeData(rand() % INT_MAX);
 				break;
-			case:1 : bench->readData();
+			case 1: bench->readData();
 				break;
-			case:2 bench->rwData(rand() % INT_MAX);
+			case 2: bench->rwData(rand() % INT_MAX);
 				break;
 		}
 	}
-	printf("%d", bench->clocks);
 
 	//bench->writeData(INT_MAX);
 	//bench->writeData(INT_MIN);
